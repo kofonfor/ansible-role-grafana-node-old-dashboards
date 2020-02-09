@@ -1,0 +1,160 @@
+grafana_node_dashboards_grafonnet:
+  - file_name: node_cpu
+    dashboard_name: CPU
+    time_from: "now-3h"
+    tags:
+      - hosts
+    templates:
+      - name: "instance"
+        query: "label_values(node_cpu, instance)"
+        label: "Instance"
+        includeAll: "false"
+    panels:
+      - name: "CPU util % on $instance"
+        stack: "true"
+        fill: 10
+        format: "percent"
+        span: 6
+        gridpos_x: 0
+        gridpos_y: 0
+        gridpos_w: 24
+        gridpos_h: 15
+        decimals: 2
+        min: 0
+        max: "105"
+        targets:
+          - expr: '(avg by (mode)(irate(node_cpu{instance="$instance"}[5m])))*100'
+            legend_format: !unsafe "{{mode}}"
+  - file_name: node_memory
+    dashboard_name: Memory
+    time_from: "now-3h"
+    tags:
+      - hosts
+    templates:
+      - name: "instance"
+        query: "label_values(node_memory_MemFree_bytes, instance)"
+        label: "Instance"
+        includeAll: "false"
+    panels:
+      - name: "Memory utilization on $instance"
+        stack: "true"
+        fill: 10
+        format: "decbytes"
+        span: 6
+        gridpos_x: 0
+        gridpos_y: 0
+        gridpos_w: 24
+        gridpos_h: 15
+        decimals: 2
+        alias_colors:
+          "Total": "rgb(219, 18, 42)"
+          "Swap total": "rgb(0, 25, 255)"
+          "Swap used": "light-purple"
+        targets:
+          - expr: 'node_memory_Buffers_bytes{instance="$instance"}'
+            legend_format: !unsafe "Buffers"
+          - expr: 'node_memory_Cached_bytes{instance="$instance"}'
+            legend_format: !unsafe "Cached"
+          - expr: 'node_memory_MemFree_bytes{instance="$instance"}'
+            legend_format: !unsafe "Free"
+          - expr: 'node_memory_MemTotal_bytes{instance="$instance"}'
+            legend_format: !unsafe "Total"
+          - expr: '-(node_memory_SwapTotal_bytes{instance="$instance"})'
+            legend_format: !unsafe "Swap total"
+          - expr: 'node_memory_SwapFree_bytes{instance="$instance"} - node_memory_SwapTotal_bytes{instance="$instance"}'
+            legend_format: !unsafe "Swap used"
+        series_overrides:
+          "Total":
+            fill: 0
+            linewidth: 2
+            stack: "false"
+          "Swap total":
+            fill: 0
+            linewidth: 2
+            stack: "false"
+          "Swap used":
+            stack: "false"
+  - file_name: node_diskutil
+    dashboard_name: "Disk util %"
+    time_from: "now-3h"
+    tags:
+      - hosts
+    templates:
+      - name: "instance"
+        query: "label_values(node_disk_io_time_seconds_total, instance)"
+        label: "Instance"
+        includeAll: "false"
+    panels:
+      - name: "Disk util % on $instance"
+        fill: 0
+        format: "percent"
+        span: 6
+        gridpos_x: 0
+        gridpos_y: 0
+        gridpos_w: 24
+        gridpos_h: 10
+        decimals: 2
+        min: 0
+        max: 100
+        alias_colors:
+          sda: "#70dbed"
+          sdb: "#bf1b00"
+        targets:
+          - expr: 'irate(node_disk_io_time_seconds_total{instance="$instance"}[5m])*100'
+            legend_format: !unsafe "{{device}}"
+  - file_name: node_conntrack
+    dashboard_name: "Connection tracking"
+    time_from: "now-3h"
+    tags:
+      - hosts
+    templates:
+      - name: "instance"
+        query: "label_values(node_nf_conntrack_entries, instance)"
+        label: "Instance"
+        includeAll: "false"
+    panels:
+      - name: "Connection tracking entries on $instance"
+        fill: 0
+        format: "short"
+        span: 6
+        gridpos_x: 0
+        gridpos_y: 0
+        gridpos_w: 24
+        gridpos_h: 10
+        decimals: 2
+        min: 0
+        alias_colors:
+          "Nr. of entries": "#e5a8e2"
+        linewidth: 2
+        targets:
+          - expr: 'node_nf_conntrack_entries{instance="$instance"}'
+            legend_format: !unsafe "Nr. of entries"
+  - file_name: node_bioinstancedevices
+    dashboard_name: "Block I/O latencies by instance and device"
+    time_from: "now-3h"
+    tags:
+      - hosts
+    templates:
+      - name: "instance"
+        query: "label_values(ebpf_exporter_bio_latency_seconds_bucket, instance)"
+        label: "Instance"
+        includeAll: "false"
+      - name: "device"
+        query: 'label_values(ebpf_exporter_bio_latency_seconds_bucket{instance="$instance"}, device)'
+        label: "Device"
+        includeAll: "false"
+    panels:
+      - name: "Block I/O latencies on ($instance, $device)"
+        type: "heatmap"
+        card_color: "#fcf82d"
+        format: "s"
+        decimals: "1"
+        gridpos_x: 0
+        gridpos_y: 0
+        gridpos_w: 24
+        gridpos_h: 14
+        targets:
+          - expr: 'sum by (le)(rate(ebpf_exporter_bio_latency_seconds_bucket{instance="$instance",device="$device"}[5m]))'
+            format: "heatmap"
+            interval_factor: 1
+            legend_format: !unsafe "{{le}}"
