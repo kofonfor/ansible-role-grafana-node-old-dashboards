@@ -1,4 +1,4 @@
-grafana_node_dashboards_grafonnet:
+grafana_node_old_dashboards_grafonnet:
   - file_name: node_cpu
     dashboard_name: CPU
     time_from: "now-3h"
