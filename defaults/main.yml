@@ -32,7 +32,7 @@ grafana_node_old_dashboards_grafonnet:
       - hosts
     templates:
       - name: "instance"
-        query: "label_values(node_memory_MemFree_bytes, instance)"
+        query: "label_values(node_memory_MemFree, instance)"
         label: "Instance"
         includeAll: "false"
     panels:
@@ -51,17 +51,17 @@ grafana_node_old_dashboards_grafonnet:
           "Swap total": "rgb(0, 25, 255)"
           "Swap used": "light-purple"
         targets:
-          - expr: 'node_memory_Buffers_bytes{instance="$instance"}'
+          - expr: 'node_memory_Buffers{instance="$instance"}'
             legend_format: !unsafe "Buffers"
-          - expr: 'node_memory_Cached_bytes{instance="$instance"}'
+          - expr: 'node_memory_Cached{instance="$instance"}'
             legend_format: !unsafe "Cached"
-          - expr: 'node_memory_MemFree_bytes{instance="$instance"}'
+          - expr: 'node_memory_MemFree{instance="$instance"}'
             legend_format: !unsafe "Free"
-          - expr: 'node_memory_MemTotal_bytes{instance="$instance"}'
+          - expr: 'node_memory_MemTotal{instance="$instance"}'
             legend_format: !unsafe "Total"
-          - expr: '-(node_memory_SwapTotal_bytes{instance="$instance"})'
+          - expr: '-(node_memory_SwapTotal{instance="$instance"})'
             legend_format: !unsafe "Swap total"
-          - expr: 'node_memory_SwapFree_bytes{instance="$instance"} - node_memory_SwapTotal_bytes{instance="$instance"}'
+          - expr: 'node_memory_SwapFree{instance="$instance"} - node_memory_SwapTotal_bytes{instance="$instance"}'
             legend_format: !unsafe "Swap used"
         series_overrides:
           "Total":
@@ -81,7 +81,7 @@ grafana_node_old_dashboards_grafonnet:
       - hosts
     templates:
       - name: "instance"
-        query: "label_values(node_disk_io_time_seconds_total, instance)"
+        query: "label_values(node_disk_io_time_ms, instance)"
         label: "Instance"
         includeAll: "false"
     panels:
@@ -100,7 +100,7 @@ grafana_node_old_dashboards_grafonnet:
           sda: "#70dbed"
           sdb: "#bf1b00"
         targets:
-          - expr: 'irate(node_disk_io_time_seconds_total{instance="$instance"}[5m])*100'
+          - expr: 'irate(node_disk_io_time_ms{instance="$instance"}[5m])*100'
             legend_format: !unsafe "{{device}}"
   - file_name: node_conntrack
     dashboard_name: "Connection tracking"
