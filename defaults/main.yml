@@ -99,9 +99,25 @@ grafana_node_old_dashboards_grafonnet:
         alias_colors:
           sda: "#70dbed"
           sdb: "#bf1b00"
+          "Avg util": "dark-orange"
+          "95th percentile": "semi-dark-red"
         targets:
           - expr: 'irate(node_disk_io_time_ms{instance="$instance"}[5m])*0.1'
             legend_format: !unsafe "{{device}}"
+          - expr: 'avg(rate(node_disk_io_time_ms[5m])*0.1)'
+            legend_format: !unsafe "Avg util"
+          - expr: 'quantile(0.95, rate(node_disk_io_time_ms[5m])*0.1)'
+            legend_format: !unsafe "95th percentile"
+          - expr: 'quantile(0.50, rate(node_disk_io_time_ms[5m])*0.1)'
+            legend_format: !unsafe "50th percentile"
+        series_overrides:
+          "Avg util":
+            dashLength: 1
+            dashes: "true"
+            spaceLength: 1
+          "95th percentile":
+            dashes: "true"
+            spaceLength: 2
   - file_name: node_conntrack
     dashboard_name: "Connection tracking"
     time_from: "now-3h"
