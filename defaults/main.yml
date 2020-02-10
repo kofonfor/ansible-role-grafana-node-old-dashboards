@@ -100,7 +100,7 @@ grafana_node_old_dashboards_grafonnet:
           sda: "#70dbed"
           sdb: "#bf1b00"
         targets:
-          - expr: 'irate(node_disk_io_time_ms{instance="$instance"}[5m])*100'
+          - expr: 'irate(node_disk_io_time_ms{instance="$instance"}[5m])*0.1'
             legend_format: !unsafe "{{device}}"
   - file_name: node_conntrack
     dashboard_name: "Connection tracking"
