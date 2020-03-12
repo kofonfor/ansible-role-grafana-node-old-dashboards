@@ -174,3 +174,32 @@ grafana_node_old_dashboards_grafonnet:
             format: "heatmap"
             interval_factor: 1
             legend_format: !unsafe "{{le}}"
+  - file_name: node_biosizeinstancedevices
+    dashboard_name: "Block I/O sizes by instance and device"
+    time_from: "now-3h"
+    tags:
+      - hosts
+    templates:
+      - name: "instance"
+        query: "label_values(ebpf_exporter_bio_size_bytes_bucket, instance)"
+        label: "Instance"
+        includeAll: "false"
+      - name: "device"
+        query: 'label_values(ebpf_exporter_bio_size_bytes_bucket{instance="$instance"}, device)'
+        label: "Device"
+        includeAll: "false"
+    panels:
+      - name: "Block I/O sizes on ($instance, $device)"
+        type: "heatmap"
+        card_color: "#f5495c"
+        format: "decbytes"
+        decimals: "1"
+        gridpos_x: 0
+        gridpos_y: 0
+        gridpos_w: 24
+        gridpos_h: 14
+        targets:
+          - expr: 'sum by (le)(rate(ebpf_exporter_bio_size_bytes_bucket{instance="$instance",device="$device"}[5m]))'
+            format: "heatmap"
+            interval_factor: 1
+            legend_format: !unsafe "{{le}}"
